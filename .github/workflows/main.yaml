@@ -34,6 +34,6 @@ jobs:
         with:
           artifacts: "build/app/outputs/apk/debug/*,build/ios/iphoneos/app.ipa"
           tag: v0.0.${{ github.run_number }}
-          # token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.MINLY_MOBILE }}
 # push to master, main, develop
 # pull request on main master
