@@ -22,7 +22,7 @@ class PostService {
       Response response =
           await dio.get('/posts?pageNumber=$pageNumber&pageSize=$pageSize');
 
-      print("response" + response.toString());
+      print("response$response");
       return response.data;
     } catch (e) {
       print(e.toString());
