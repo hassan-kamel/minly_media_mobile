@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:minly_media_mobile/data/models/post/post.dart';
+import 'package:minly_media_mobile/presentation/widgets/minly_player.dart';
 import 'package:minly_media_mobile/utils/get_time.dart';
 import 'package:recase/recase.dart';
 
@@ -84,7 +85,13 @@ class _PostWidgetState extends State<PostWidget> {
                 height: 400,
                 fit: BoxFit.cover,
               )
-            : const Text('Video not supported'),
+            :
+
+            // const Center(
+            //     child: CircularProgressIndicator(),
+            //   ),
+
+            MinlyPlayer(url: widget.post.mediaUrl),
 
         // Post Footer
         Container(
