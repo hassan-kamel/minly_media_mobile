@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:minly_media_mobile/constants/strings.dart';
 
@@ -16,17 +18,17 @@ class PostService {
   }
 
   // get posts
-  Future<List<Map<String, dynamic>>> getPosts(
-      int pageNumber, int pageSize) async {
+  Future<Map<String, dynamic>> getPosts(int pageNumber, int pageSize) async {
     try {
       Response response =
-          await dio.get('/posts?pageNumber=$pageNumber&pageSize=$pageSize');
+          await dio.get('/post?pageNumber=$pageNumber&pageSize=$pageSize');
 
       print("response$response");
-      return response.data;
+
+      return jsonDecode(response.toString());
     } catch (e) {
       print(e.toString());
-      return [];
+      return {};
     }
   }
 }

@@ -1,39 +1,63 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:minly_media_mobile/data/models/post/post.dart';
+import 'package:minly_media_mobile/utils/get_time.dart';
+import 'package:recase/recase.dart';
 
-class Post extends StatefulWidget {
-  const Post({super.key});
+class PostWidget extends StatefulWidget {
+  const PostWidget({super.key, required this.post});
+  final Post post;
 
   @override
-  State<Post> createState() => _PostState();
+  State<PostWidget> createState() => _PostWidgetState();
 }
 
-class _PostState extends State<Post> {
+class _PostWidgetState extends State<PostWidget> {
+  @override
+  void initState() {
+    super.initState();
+
+    debugPrint(widget.post.mediaUrl);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         // Post Header
         Container(
-          margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+          margin: const EdgeInsets.all(20),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   backgroundColor: Colors.black,
                   child: Text(
-                    'HK',
-                    style: TextStyle(
+                    widget.post.author.fullName!.substring(0, 2).toUpperCase(),
+                    style: const TextStyle(
                       color: Colors.white,
                     ),
                   ),
                 ),
                 Container(
                   margin: const EdgeInsets.only(left: 10),
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [Text('Hassan Kamel'), Text('2h')],
+                    children: [
+                      Text(
+                        // ReCase(widget.post.author.fullName!).titleCase,
+                        widget.post.author.fullName!.titleCase,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          // capitalize: true
+                        ),
+                      ),
+                      Text(getTime(widget.post.createdAt.toString()))
+                    ],
                   ),
                 ),
               ],
@@ -47,7 +71,51 @@ class _PostState extends State<Post> {
           ]),
         ),
         //  Post Media
-        Container()
+        widget.post.type == 'IMAGE'
+            ? CachedNetworkImage(
+                imageUrl: widget.post.mediaUrl,
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) {
+                  debugPrint(error.toString());
+                  return const Icon(Icons.error);
+                },
+                width: MediaQuery.of(context).size.width,
+                height: 400,
+                fit: BoxFit.cover,
+              )
+            : const Text('Video not supported'),
+
+        // Post Footer
+        Container(
+          margin: const EdgeInsets.all(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: SvgPicture.asset('assets/icons/heart-lined.svg',
+                        width: 30),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: SvgPicture.asset('assets/icons/comment.svg'),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.share_outlined),
+                  ),
+                ],
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: SvgPicture.asset('assets/icons/bookmark.svg'),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

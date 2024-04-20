@@ -7,7 +7,10 @@ class PostRepository {
   PostRepository({required this.postService});
 
   Future<List<Post>> getPosts(int pageNumber, int pageSize) async {
-    final posts = await postService.getPosts(pageNumber, pageSize);
+    final postsResponse = await postService.getPosts(pageNumber, pageSize);
+
+    List<dynamic> posts = postsResponse['data'];
+    print(posts);
     return posts.map((post) => Post.fromJson(post)).toList();
   }
 }
