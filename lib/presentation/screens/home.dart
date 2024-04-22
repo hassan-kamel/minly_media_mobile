@@ -1,34 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:minly_media_mobile/constants/minly_colors.dart';
-import 'package:minly_media_mobile/presentation/screens/home_tabs/create_post.dart';
-import 'package:minly_media_mobile/presentation/screens/home_tabs/feeds.dart';
-import 'package:minly_media_mobile/presentation/screens/home_tabs/profile.dart';
-import 'package:minly_media_mobile/presentation/screens/home_tabs/reels.dart';
-import 'package:minly_media_mobile/presentation/screens/home_tabs/search.dart';
 import 'package:minly_media_mobile/presentation/widgets/gradientText.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key, required this.navigationShell});
 
-  final String title;
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = [
-    const FeedsTab(),
-    const SearchTab(),
-    const CreatePostTab(),
-    const ReelsTab(),
-    const ProfileTab(),
-  ];
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +18,7 @@ class _HomePageState extends State<HomePage> {
         automaticallyImplyLeading: true,
         backgroundColor: Colors.white,
         title: GradientText(
-          widget.title,
+          'MinlyMedia',
           style: GoogleFonts.pacifico(
             fontSize: 30,
           ),
@@ -57,38 +38,34 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: _pages[_selectedIndex],
+      body: navigationShell,
 
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        currentIndex: _selectedIndex,
+        currentIndex: navigationShell.currentIndex,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         elevation: 0.0,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+        onTap: _onTap,
         items: [
           BottomNavigationBarItem(
-              icon: SvgPicture.asset(_selectedIndex == 0
+              icon: SvgPicture.asset(navigationShell.currentIndex == 0
                   ? 'assets/icons/home-bold.svg'
                   : 'assets/icons/home-outline.svg'),
               label: ''),
           BottomNavigationBarItem(
-              icon: SvgPicture.asset(_selectedIndex == 1
+              icon: SvgPicture.asset(navigationShell.currentIndex == 1
                   ? 'assets/icons/search-bold.svg'
                   : 'assets/icons/search-outline.svg'),
               label: ''),
           BottomNavigationBarItem(
-              icon: SvgPicture.asset(_selectedIndex == 2
+              icon: SvgPicture.asset(navigationShell.currentIndex == 2
                   ? 'assets/icons/add-square-bold.svg'
                   : 'assets/icons/add-square-outline.svg'),
               label: ''),
           BottomNavigationBarItem(
-              icon: SvgPicture.asset(_selectedIndex == 3
+              icon: SvgPicture.asset(navigationShell.currentIndex == 3
                   ? 'assets/icons/video-play-bold.svg'
                   : 'assets/icons/video-play-outline.svg'),
               label: ''),
@@ -104,6 +81,13 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  void _onTap(index) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
     );
   }
 }

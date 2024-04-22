@@ -95,31 +95,61 @@ class _PostWidgetState extends State<PostWidget> {
 
         // Post Footer
         Container(
-          margin: const EdgeInsets.all(20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          margin: const EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 5),
+          child: Column(
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: SvgPicture.asset('assets/icons/heart-lined.svg',
-                        width: 30),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: SvgPicture.asset('assets/icons/heart-lined.svg',
+                            width: 30),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: SvgPicture.asset('assets/icons/comment.svg'),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.share_outlined),
+                      ),
+                    ],
                   ),
                   IconButton(
                     onPressed: () {},
-                    icon: SvgPicture.asset('assets/icons/comment.svg'),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.share_outlined),
+                    icon: SvgPicture.asset('assets/icons/bookmark.svg'),
                   ),
                 ],
               ),
-              IconButton(
-                onPressed: () {},
-                icon: SvgPicture.asset('assets/icons/bookmark.svg'),
-              ),
+
+              Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                alignment: Alignment.topLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    widget.post.likedBy.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(bottom: 5),
+                            child: Text(
+                              "${widget.post.likedBy.length.toString()} likes",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                        : Container(),
+
+                    // Post Caption
+                    Text(widget.post.caption.titleCase),
+                  ],
+                ),
+              )
+              // Post Likes
             ],
           ),
         ),

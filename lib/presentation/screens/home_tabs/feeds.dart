@@ -56,7 +56,7 @@ class _FeedsTabState extends State<FeedsTab> {
 
         // unknown state
         return const Center(
-          child: Text('Something went wrong'),
+          child: CircularProgressIndicator(),
         );
       },
     );
