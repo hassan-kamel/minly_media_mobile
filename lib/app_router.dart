@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:minly_media_mobile/presentation/screens/signin_or_signup.dart';
 
 import 'presentation/screens/home_tabs/create_post.dart';
 import 'presentation/screens/home_tabs/feeds.dart';
 import 'presentation/screens/home_tabs/profile.dart';
 import 'presentation/screens/home_tabs/reels.dart';
 import 'presentation/screens/home_tabs/search.dart';
-
 import 'presentation/screens/home.dart';
-import 'presentation/screens/login.dart';
-import 'presentation/screens/signup.dart';
 
 // Create keys for `root` & `section` navigator avoiding unnecessary rebuilds
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -18,7 +16,7 @@ final _sectionNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/feed',
+    initialLocation: '/auth',
     routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -27,10 +25,11 @@ final GoRouter appRouter = GoRouter(
         branches: [
           // The route branch for the 1º Tab
           StatefulShellBranch(
+            initialLocation: '/feeds',
             navigatorKey: _sectionNavigatorKey,
             routes: <RouteBase>[
               GoRoute(
-                path: '/feed',
+                path: '/feeds',
                 builder: (context, state) => const FeedsTab(),
               ),
             ],
@@ -69,6 +68,6 @@ final GoRouter appRouter = GoRouter(
           ])
         ],
       ),
-      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
-      GoRoute(path: '/signup', builder: (context, state) => const SignupPage()),
+      GoRoute(
+          path: '/auth', builder: (context, state) => const LoginOrRegister()),
     ]);
