@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import 'package:minly_media_mobile/business-logic/bloc/auth/user_bloc.dart';
+import 'package:minly_media_mobile/constants/minly_colors.dart';
 import 'package:minly_media_mobile/presentation/widgets/button.dart';
-import 'package:minly_media_mobile/presentation/widgets/square_tile.dart';
+import 'package:minly_media_mobile/presentation/widgets/form_errors.dart';
+import 'package:minly_media_mobile/presentation/widgets/gradientText.dart';
 import 'package:minly_media_mobile/presentation/widgets/text_field.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
-  LoginPage({super.key, required this.onTap});
+  const LoginPage({super.key, required this.onTap});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -15,202 +20,148 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
-
   final passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   void signUserIn(BuildContext context) async {
-    context.go("/feeds");
-    // show loading circle
-    // showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return const Center(
-    //         child: CircularProgressIndicator(),
-    //       );
-    //     });
-  }
-
-  void genericErrorMessage(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
+    BlocProvider.of<UserBloc>(context).add(UserInitialEvent());
+    // Validate returns true if the form is valid, or false otherwise.
+    if (_formKey.currentState!.validate()) {
+      BlocProvider.of<UserBloc>(context).add(UserLoginEvent(
+          email: emailController.text, password: passwordController.text));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 243, 243, 243),
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 50),
-                //logo
-                const Icon(
-                  Icons.lock_person,
-                  size: 150,
-                ),
-                const SizedBox(height: 10),
-                //welcome back you been missed
+    return BlocBuilder<UserBloc, UserState>(
+      builder: (context, state) {
+        if (state is UserLoggedIn) {
+          context.go('/feeds');
+          return const SizedBox();
+        }
 
-                Text(
-                  'Welcome back you\'ve been missed',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 15,
-                  ),
-                ),
-                const SizedBox(height: 25),
-
-                //username
-                MyTextField(
-                  controller: emailController,
-                  hintText: 'Username or email',
-                  obscureText: false,
-                ),
-
-                const SizedBox(height: 15),
-                //password
-                MyTextField(
-                  controller: passwordController,
-                  hintText: 'Password',
-                  obscureText: true,
-                ),
-                const SizedBox(height: 15),
-
-                //sign in button
-                MyButton(
-                  onTap: () {
-                    signUserIn(context);
-                  },
-                  text: 'Sign In',
-                ),
-                const SizedBox(height: 20),
-
-                //forgot passowrd
-
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Forgot your login details? ',
-                        style: TextStyle(
-                            color: Colors.grey.shade600, fontSize: 12),
-                      ),
-                      Text(
-                        'Get help logging in.',
-                        style: TextStyle(
-                          color: Colors.blue.shade900,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 10,
-                ),
-
-                // continue with
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
-                        child: Text(
-                          'OR',
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 60),
-
-                //google + apple button
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    //google buttom
-                    SquareTile(
-                      onTap: () {},
-                      imagePath: 'assets/icons/google.svg',
-                      height: 70,
-                    ),
-
-                    SizedBox(width: 20),
-                    // apple buttom
-                    SquareTile(
-                      onTap: () {},
-                      imagePath: 'assets/icons/vector.svg',
-                      height: 70,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 100,
-                ),
-
-                // not a memeber ? register now
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Not a member? ',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
-                    GestureDetector(
-                      onTap: widget.onTap,
-                      child: Text(
-                        'Register now',
-                        style: TextStyle(
-                            color: Colors.blue[900],
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15),
-                      ),
-                    ),
-                  ],
+        return Scaffold(
+          backgroundColor: const Color.fromARGB(255, 243, 243, 243),
+          resizeToAvoidBottomInset: true,
+          body: state is UserGettingAuthenticated
+              ? const Center(
+                  child: CircularProgressIndicator(),
                 )
-              ],
-            ),
-          ),
-        ),
-      ),
+              : SafeArea(
+                  child: SingleChildScrollView(
+                    child: Center(
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 50),
+                            //logo
+                            //logo
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: GradientText(
+                                'MinlyMedia',
+                                style: GoogleFonts.pacifico(
+                                  fontSize: 50,
+                                ),
+                                gradient: LinearGradient(colors: [
+                                  MinlyColor.primary_2,
+                                  MinlyColor.primary_1,
+                                ]),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            //welcome back you been missed
+
+                            Text(
+                              'Welcome back you\'ve been missed',
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 25),
+
+                            state is UserLoginError
+                                ? Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 25, vertical: 10),
+                                    child: FormError(errors: [state.message]),
+                                  )
+                                : const SizedBox(),
+                            //username
+                            MyTextField(
+                              controller: emailController,
+                              hintText: 'email',
+                              obscureText: false,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'This Field is Required';
+                                }
+                                return null;
+                              },
+                            ),
+
+                            const SizedBox(height: 15),
+                            //password
+                            MyTextField(
+                              controller: passwordController,
+                              hintText: 'Password',
+                              obscureText: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'This Field is Required';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 15),
+
+                            //sign in button
+                            MyButton(
+                              onTap: () {
+                                signUserIn(context);
+                              },
+                              text: 'Sign In',
+                            ),
+                            const SizedBox(height: 20),
+
+                            const SizedBox(
+                              height: 10,
+                            ),
+
+                            // not a member ? register now
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Not a member? ',
+                                  style: TextStyle(
+                                      color: Colors.grey[600], fontSize: 12),
+                                ),
+                                GestureDetector(
+                                  onTap: widget.onTap,
+                                  child: Text(
+                                    'Register now',
+                                    style: TextStyle(
+                                        color: Colors.blue[900],
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+        );
+      },
     );
   }
 }

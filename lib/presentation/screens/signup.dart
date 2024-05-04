@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:minly_media_mobile/business-logic/bloc/auth/user_bloc.dart';
+import 'package:minly_media_mobile/constants/minly_colors.dart';
 import 'package:minly_media_mobile/presentation/widgets/button.dart';
-import 'package:minly_media_mobile/presentation/widgets/square_tile.dart';
+import 'package:minly_media_mobile/presentation/widgets/form_errors.dart';
+import 'package:minly_media_mobile/presentation/widgets/gradientText.dart';
 import 'package:minly_media_mobile/presentation/widgets/text_field.dart';
 
 class SignupPage extends StatefulWidget {
@@ -16,176 +22,163 @@ class _SignupPageState extends State<SignupPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final _signUpFormKey = GlobalKey<FormState>();
 
   void signUserUp() async {
-    // show loading circle
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
-  }
-
-  void genericErrorMessage(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
+    BlocProvider.of<UserBloc>(context).add(UserInitialEvent());
+    // Validate returns true if the form is valid, or false otherwise.
+    if (_signUpFormKey.currentState!.validate()) {
+      if (passwordController.text == confirmPasswordController.text) {
+        BlocProvider.of<UserBloc>(context).add(UserSignupEvent(
+            fullName: fullNameController.text,
+            email: emailController.text,
+            password: passwordController.text));
+      } else {
+        BlocProvider.of<UserBloc>(context)
+            .add(const UserAuthErrorEvent(message: 'passwords do not match'));
+      }
+    } else {
+      debugPrint('form not valid');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 243, 243, 243),
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 50),
-                //logo
-                const Icon(
-                  Icons.lock,
-                  size: 100,
-                ),
-                const SizedBox(height: 10),
-                //welcome back you been missed
+    return BlocBuilder<UserBloc, UserState>(
+      builder: (context, state) {
+        if (state is UserLoggedIn) {
+          context.go('/feeds');
+          return const SizedBox();
+        }
 
-                const SizedBox(height: 25),
-
-                //username
-                MyTextField(
-                  controller: fullNameController,
-                  hintText: 'full name',
-                  obscureText: false,
-                ),
-                const SizedBox(height: 15),
-                //username
-                MyTextField(
-                  controller: emailController,
-                  hintText: 'email',
-                  obscureText: false,
-                ),
-
-                const SizedBox(height: 15),
-                //password
-                MyTextField(
-                  controller: passwordController,
-                  hintText: 'Password',
-                  obscureText: true,
-                ),
-                const SizedBox(height: 15),
-
-                MyTextField(
-                  controller: confirmPasswordController,
-                  hintText: 'Confirm Password',
-                  obscureText: true,
-                ),
-                const SizedBox(height: 15),
-
-                //sign in button
-                MyButton(
-                  onTap: signUserUp,
-                  text: 'Sign Up',
-                ),
-                const SizedBox(height: 20),
-
-                // continue with
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Row(
+        return Scaffold(
+          backgroundColor: const Color.fromARGB(255, 243, 243, 243),
+          resizeToAvoidBottomInset: true,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Center(
+                child: Form(
+                  key: _signUpFormKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
+                      const SizedBox(height: 50),
+                      //logo
                       Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
-                        child: Text(
-                          'OR',
-                          style: TextStyle(color: Colors.grey.shade600),
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: GradientText(
+                          'MinlyMedia',
+                          style: GoogleFonts.pacifico(
+                            fontSize: 50,
+                          ),
+                          gradient: LinearGradient(colors: [
+                            MinlyColor.primary_2,
+                            MinlyColor.primary_1,
+                          ]),
                         ),
                       ),
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey.shade400,
-                        ),
+                      const SizedBox(height: 10),
+                      //welcome back you been missed
+
+                      state is UserLoginError
+                          ? Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 25, vertical: 10),
+                              child: FormError(errors: [state.message]),
+                            )
+                          : const SizedBox(),
+
+                      //username
+                      MyTextField(
+                        controller: fullNameController,
+                        hintText: 'full name',
+                        obscureText: false,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This Field is Required';
+                          }
+                          return null;
+                        },
                       ),
+                      const SizedBox(height: 15),
+                      //username
+                      MyTextField(
+                        controller: emailController,
+                        hintText: 'email',
+                        obscureText: false,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This Field is Required';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 15),
+                      //password
+                      MyTextField(
+                        controller: passwordController,
+                        hintText: 'Password',
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This Field is Required';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 15),
+
+                      MyTextField(
+                        controller: confirmPasswordController,
+                        hintText: 'Confirm Password',
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This Field is Required';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 15),
+
+                      //sign in button
+                      MyButton(
+                        onTap: signUserUp,
+                        text: 'Sign Up',
+                      ),
+                      const SizedBox(height: 20),
+
+                      // not a member ? register now
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Already have an account? ',
+                            style: TextStyle(
+                                color: Colors.grey[600], fontSize: 12),
+                          ),
+                          GestureDetector(
+                            onTap: widget.onTap,
+                            child: Text(
+                              'Login now',
+                              style: TextStyle(
+                                  color: Colors.blue[900],
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14),
+                            ),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),
-                const SizedBox(height: 60),
-
-                //google + apple button
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    //google buttom
-                    SquareTile(
-                      onTap: () => {},
-                      imagePath: 'assets/icons/google.svg',
-                      height: 70,
-                    ),
-
-                    const SizedBox(width: 20),
-                    // apple buttom
-                    SquareTile(
-                      onTap: () {},
-                      imagePath: 'assets/icons/apple.svg',
-                      height: 70,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 100,
-                ),
-
-                // not a memeber ? register now
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Already have an account? ',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
-                    GestureDetector(
-                      onTap: widget.onTap,
-                      child: Text(
-                        'Login now',
-                        style: TextStyle(
-                            color: Colors.blue[900],
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
-                      ),
-                    ),
-                  ],
-                )
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

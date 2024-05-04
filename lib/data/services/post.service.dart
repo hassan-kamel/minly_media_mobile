@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:minly_media_mobile/constants/strings.dart';
 
 class PostService {
@@ -23,11 +24,11 @@ class PostService {
       Response response =
           await dio.get('/post?pageNumber=$pageNumber&pageSize=$pageSize');
 
-      print("response$response");
+      debugPrint("response$response");
 
       return jsonDecode(response.toString());
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
       return {};
     }
   }

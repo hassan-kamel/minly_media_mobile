@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:minly_media_mobile/app_router.dart';
+import 'package:minly_media_mobile/business-logic/bloc/auth/user_bloc.dart';
 import 'package:minly_media_mobile/business-logic/bloc/post/post_bloc.dart';
 
 void main() {
@@ -13,8 +14,15 @@ class MinlyMediaApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => PostsBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<PostsBloc>(
+          create: (BuildContext context) => PostsBloc(),
+        ),
+        BlocProvider<UserBloc>(
+          create: (BuildContext context) => UserBloc(),
+        ),
+      ],
       child: MaterialApp.router(
         // Remove the debug banner
         debugShowCheckedModeBanner: false,

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:minly_media_mobile/data/Repositories/post.repository.dart';
 import 'package:minly_media_mobile/data/models/post/post.dart';
 import 'package:minly_media_mobile/data/services/post.service.dart';
@@ -19,16 +20,16 @@ class PostsBloc extends Bloc<PostsEvent, PostsState> {
       PostsFetchEvent event, Emitter<PostsState> emit) async {
     emit(PostsFetching());
     try {
-      print('hi');
+      debugPrint('hi');
       final posts = await PostRepository(postService: PostService())
           .getPosts(event.pageNumber, event.pageSize);
 
       emit(PostFetchedSuccessfully(posts: posts));
 
-      print(posts.toString());
+      debugPrint(posts.toString());
     } catch (e) {
       emit(PostFetchError(message: e.toString()));
-      print(e.toString());
+      debugPrint(e.toString());
     }
   }
 }
