@@ -21,5 +21,6 @@ final class UserLoggedIn extends UserState {
 
 final class UserLoginError extends UserState {
   final String message;
-  const UserLoginError({required this.message});
+  final List<String> errors;
+  const UserLoginError({required this.message, required this.errors});
 }

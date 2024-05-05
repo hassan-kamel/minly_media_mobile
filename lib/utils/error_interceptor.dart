@@ -24,6 +24,7 @@ class ErrorInterceptor extends Interceptor {
             response.data['message'] ??
             response.data['error']?['status'] ??
             "Something went wrong",
+        'errors': response.data['error']?['error'] ?? []
       });
     }
     super.onResponse(newResponse, handler);

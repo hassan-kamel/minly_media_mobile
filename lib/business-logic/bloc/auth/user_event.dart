@@ -32,3 +32,5 @@ class UserAuthErrorEvent extends UserEvent {
 }
 
 class UserLogoutEvent extends UserEvent {}
+
+class CheckUserIsAuthenticated extends UserEvent {}

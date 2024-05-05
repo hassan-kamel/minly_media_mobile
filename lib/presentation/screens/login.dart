@@ -34,13 +34,14 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<UserBloc, UserState>(
-      builder: (context, state) {
+    return BlocConsumer<UserBloc, UserState>(
+      listener: (context, state) {
         if (state is UserLoggedIn) {
+          debugPrint("state ------------------ " + state.toString());
           context.go('/feeds');
-          return const SizedBox();
         }
-
+      },
+      builder: (context, state) {
         return Scaffold(
           backgroundColor: const Color.fromARGB(255, 243, 243, 243),
           resizeToAvoidBottomInset: true,
@@ -88,7 +89,10 @@ class _LoginPageState extends State<LoginPage> {
                                 ? Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 25, vertical: 10),
-                                    child: FormError(errors: [state.message]),
+                                    child: FormError(errors: [
+                                      state.message,
+                                      ...state.errors
+                                    ]),
                                   )
                                 : const SizedBox(),
                             //username

@@ -28,7 +28,7 @@ class MinlyMediaApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         // Set the routes
         routerConfig: appRouter,
-        title: 'Flutter Demo',
+        title: 'Minly Media',
         // Set the theme
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
