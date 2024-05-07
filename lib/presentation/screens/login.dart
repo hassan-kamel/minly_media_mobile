@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<UserBloc, UserState>(
       listener: (context, state) {
         if (state is UserLoggedIn) {
-          debugPrint("state ------------------ " + state.toString());
+          debugPrint("state ------------------ $state");
           context.go('/feeds');
         }
       },

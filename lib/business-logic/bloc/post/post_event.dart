@@ -6,7 +6,10 @@ class PostsFetchEvent extends PostsEvent {
   final int pageNumber;
   final int pageSize;
 
-  PostsFetchEvent({required this.pageNumber, required this.pageSize});
+  final List<Post>? posts;
+
+  PostsFetchEvent(
+      {required this.pageNumber, required this.pageSize, this.posts});
 
   @override
   List<Object> get props => [pageNumber, pageSize];
@@ -19,4 +22,13 @@ class PostErrorEvent extends PostsEvent {
 
   @override
   List<Object> get props => [message];
+}
+
+class CreatePostEvent extends PostsEvent {
+  final FormData post;
+
+  CreatePostEvent({required this.post});
+
+  @override
+  List<Object> get props => [post];
 }

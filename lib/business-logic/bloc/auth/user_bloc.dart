@@ -62,7 +62,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
             authService: AuthService(), userShared: UserShared())
         .signup(event.fullName, event.email, event.password);
 
-    debugPrint("bloc" + response.toString());
+    debugPrint("bloc$response");
     // fulfilled
     if (response['user'] != null) {
       emit(UserLoggedIn(
@@ -99,12 +99,12 @@ class UserBloc extends Bloc<UserEvent, UserState> {
             authService: AuthService(), userShared: UserShared())
         .getToken();
 
-    debugPrint("token -->" + token.toString());
+    debugPrint("token -->$token");
 
     if (token != null) {
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
 
-      debugPrint("decoded  -->" + decodedToken.toString());
+      debugPrint("decoded  -->$decodedToken");
 
       emit(UserLoggedIn(token: token, user: User.fromJson(decodedToken)));
     } else {

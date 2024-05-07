@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
     return BlocConsumer<UserBloc, UserState>(
       listener: (context, state) {
         if (state is UserInitial) {
-          debugPrint("state ------------------ " + state.toString());
+          debugPrint("state ------------------ $state");
           context.go('/auth');
         }
       },

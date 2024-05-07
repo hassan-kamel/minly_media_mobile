@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:minly_media_mobile/business-logic/bloc/post/post_bloc.dart';
+import 'package:minly_media_mobile/data/models/post/post.dart';
 import 'package:minly_media_mobile/presentation/widgets/post.dart';
 
 class FeedsTab extends StatefulWidget {
@@ -11,53 +12,104 @@ class FeedsTab extends StatefulWidget {
 }
 
 class _FeedsTabState extends State<FeedsTab> {
+  BuildContext? dialogContext;
+  late ScrollController _scrollController;
+
+  int currentPage = 1;
+  List<Post> posts = [];
+
+  _scrollListener() {
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      currentPage++;
+      PostsState state = BlocProvider.of<PostsBloc>(context).state;
+      BlocProvider.of<PostsBloc>(context).add(PostsFetchEvent(
+          pageNumber: currentPage,
+          pageSize: 50,
+          posts: state is PostFetchedSuccessfully ? state.posts : null));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
     BlocProvider.of<PostsBloc>(context)
-        .add(PostsFetchEvent(pageNumber: 1, pageSize: 10));
+        .add(PostsFetchEvent(pageNumber: 1, pageSize: 50));
+
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PostsBloc, PostsState>(
-      builder: (context, state) {
+    return BlocConsumer<PostsBloc, PostsState>(
+      listener: (context, state) {
         // initial state
-        if (state is PostsInitial ||
-            state is PostFetchedSuccessfully && state.posts.isEmpty) {
-          return const Center(
-            child: Text('No Data'),
+        if (state is PostsInitial || state is PostFetchedSuccessfully) {
+          setState(() {
+            posts = state is PostFetchedSuccessfully
+                ? state.posts
+                : List<Post>.empty();
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Posts loaded successfully'),
+            ),
           );
+          if (dialogContext != null) {
+            Navigator.pop(dialogContext!);
+          }
         }
 
         // fetching state
         if (state is PostsFetching || state is PostsInitial) {
-          const Center(
-            child: CircularProgressIndicator(),
-          );
+          showDialog(
+              context: context,
+              builder: (context) {
+                dialogContext = context;
+                return const Center(child: CircularProgressIndicator());
+              });
         }
         // error state
         if (state is PostFetchError) {
-          return Center(
-            child: Text(state.message),
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Error'),
+                  content: Text(state.message),
+                );
+              });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+            ),
           );
+          Navigator.pop(context);
         }
-
-        // success state
+      },
+      builder: (context, state) {
+        // success  state
         if (state is PostFetchedSuccessfully) {
-          return ListView.builder(
-            itemCount: state.posts.length,
-            itemBuilder: (BuildContext context, int index) {
-              return PostWidget(post: state.posts[index]);
+          return RefreshIndicator(
+            onRefresh: () async {
+              currentPage = 1;
+              BlocProvider.of<PostsBloc>(context)
+                  .add(PostsFetchEvent(pageNumber: 1, pageSize: 50));
             },
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: posts.length,
+              itemBuilder: (BuildContext context, int index) {
+                return PostWidget(post: posts[index]);
+              },
+            ),
           );
         }
 
-        // unknown state
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
+        return const Center(child: Text('No posts yet'));
       },
     );
   }

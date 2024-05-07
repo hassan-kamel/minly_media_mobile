@@ -47,7 +47,7 @@ class _SignupPageState extends State<SignupPage> {
     return BlocConsumer<UserBloc, UserState>(
       listener: (context, state) {
         if (state is UserLoggedIn) {
-          debugPrint("state ------------------ " + state.toString());
+          debugPrint("state ------------------ $state");
           context.go('/feeds');
         }
       },

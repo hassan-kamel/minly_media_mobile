@@ -78,20 +78,14 @@ class _PostWidgetState extends State<PostWidget> {
                 placeholder: (context, url) =>
                     const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) {
-                  debugPrint(error.toString());
+                  debugPrint("post-error$error");
                   return const Icon(Icons.error);
                 },
                 width: MediaQuery.of(context).size.width,
                 height: 400,
                 fit: BoxFit.cover,
               )
-            :
-
-            // const Center(
-            //     child: CircularProgressIndicator(),
-            //   ),
-
-            MinlyPlayer(url: widget.post.mediaUrl),
+            : MinlyPlayer(url: widget.post.mediaUrl),
 
         // Post Footer
         Container(
